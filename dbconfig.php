@@ -2,7 +2,7 @@
 // dbconfig.php
 
 $host = 'localhost';    // Database host
-$dbname = 'test2base';   // Database name (change as necessary)
+$dbname = 'testbase';   // Database name (change as necessary)
 $user = 'tester';       // Database username (change as necessary)
 $pass = 'comptest';     // Database password (change as necessary)
 $chrs = 'utf8mb4';      // Character set
