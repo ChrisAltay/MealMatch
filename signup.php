@@ -7,7 +7,7 @@
     <header class="w-full bg-white shadow">
         <div class="container mx-auto flex justify-between items-center py-4 px-6">
             <div class="text-lg font-semibold">
-                [Title Here]
+                NealMatch
             </div>
             <nav class="space-x-4">
                 <a href="index.php" class="text-gray-600 hover:text-gray-900">Home</a>

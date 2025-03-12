@@ -1,3 +1,5 @@
+// search.js
+
 const API_BASE_URL = 'https://www.themealdb.com/api/json/v1/1/';
 const MAX_SUGGESTIONS = 10;
 
@@ -9,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Debounce function to limit API calls
     function debounce(func, delay) {
         let timeout;
-        return function(...args) {
+        return function (...args) {
             clearTimeout(timeout);
             timeout = setTimeout(() => func.apply(this, args), delay);
         };
@@ -21,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`${API_BASE_URL}list.php?i=list`);
             const data = await response.json();
             return data.meals
-                .filter(ingredient => 
+                .filter(ingredient =>
                     ingredient.strIngredient.toLowerCase().includes(query.toLowerCase())
                 )
                 .slice(0, MAX_SUGGESTIONS);
@@ -99,19 +101,30 @@ document.addEventListener('DOMContentLoaded', () => {
     function displayResults(meals) {
         searchResults.innerHTML = meals
             .map(meal => `
-                <div class="recipe-card border p-4 w-64 mb-4">
-                    <img src="${meal.strMealThumb}" alt="${meal.strMeal}" class="w-full h-auto mb-2">
-                    <p class="text-center">${meal.strMeal}</p>
-                    <button class="border p-2 w-full mt-2" onclick="showRecipeDetails('${meal.idMeal}')">
-                        View Recipe
+            <div class="recipe-card border p-4 w-64 mb-4">
+                <img src="${meal.strMealThumb}" alt="${meal.strMeal}" class="w-full h-auto mb-2">
+                <p class="text-center">${meal.strMeal}</p>
+                <div class="flex justify-between mt-2">
+                    <button class="border p-2" onclick="saveMeal('${meal.idMeal}')">
+                        <i class="fas fa-heart"></i> Save
+                    </button>
+                    <button class="border p-2" onclick="rateMeal('${meal.idMeal}')">
+                        <i class="fas fa-star"></i> Rate
+                    </button>
+                    <button class="border p-2" onclick="bookmarkMeal('${meal.idMeal}')">
+                        <i class="fas fa-calendar"></i> Bookmark
                     </button>
                 </div>
-            `)
+                <button class="border p-2 w-full mt-2" onclick="showRecipeDetails('${meal.idMeal}')">
+                    View Recipe
+                </button>
+            </div>
+        `)
             .join('');
     }
 
     // Show recipe details
-    window.showRecipeDetails = async function(mealId) {
+    window.showRecipeDetails = async function (mealId) {
         try {
             const response = await fetch(`${API_BASE_URL}lookup.php?i=${mealId}`);
             const data = await response.json();
@@ -152,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Close modal
-    window.closeModal = function() {
+    window.closeModal = function () {
         const modal = document.querySelector('.fixed.inset-0');
         if (modal) modal.remove();
     };

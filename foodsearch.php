@@ -11,7 +11,7 @@
     <div class="container mx-auto p-4">
         <!-- Navigation -->
         <nav class="flex justify-between items-center py-4 border-b">
-            <div class="text-lg font-bold">[Title Here]</div>
+            <div class="text-lg font-bold">MealMatch</div>
             <div class="space-x-4">
                 <a href="index.php" class="text-gray-600 hover:text-gray-900">Home</a>
                 <a href="about.php" class="text-gray-600 hover:text-gray-900">About</a>
