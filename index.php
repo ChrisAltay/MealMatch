@@ -80,14 +80,14 @@ function rateMeal(mealId) {
                 })
                 .then(response => response.json())
                 .then(data => {
-                    alert(data.success ? 'Meal rated successfully!' : data.message);
+                    alert(data.success ? 'Thanks for your feedback!' : data.message);
                 })
                 .catch(error => {
                     console.error('Error rating meal:', error);
                     alert('An error occurred while rating the meal.');
                 });
             } else {
-                alert('Please enter a valid rating, numbers(1-5).');
+                alert('Please enter a valid rating, numbers(1-5), 1 being very bad and 5 very good..');
             }
         }
 
