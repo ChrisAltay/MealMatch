@@ -201,10 +201,18 @@ $isLoggedIn = isset($_SESSION['username']); // Check if the user is logged in
                                 <h2 class="text-2xl font-bold mb-4">${meal.strMeal}</h2>
                                 <img src="${meal.strMealThumb}" alt="${meal.strMeal}" class="w-full h-64 object-cover mb-4">
                                 <h3 class="text-xl font-semibold mb-2">Ingredients:</h3>
-                                <ul class="mb-4">${ingredients.map(ing => `<li>${ing}</li>`).join('')}</ul>
-                                <h3 class="text-xl font-semibold mb-2">Instructions:</h3>
+                                <ul class="mb-4">
+                                    ${ingredients.map(ing => `<li>${ing}</li>`).join('')}
+                                </ul>
+                                <h3 class="text-xl font-semibold mb-2">Missing ingredients? Locations to shop below:</h3>
+                                <h6 class="text-xl font-semibold">Grocery Stores & Supermarkets:</h6>
+                                Walmart | Costco | Whole Foods Market | Aldi | Local Farmers Market | Shoprite | Target | Kroger
+                                <h6 class="text-xl font-semibold mt-2">Online Grocery Stores:</h6>
+                                Amazon Fresh | FreshDirect | Walmart Grocery Delivery | Instacart | Misfits Market | Boxed | Weee!
+                                
+                                <h3 class="text-xl font-semibold mb-2 mt-4">Instructions:</h3>
                                 <p class="mb-4">${meal.strInstructions}</p>
-                                <button onclick="closeModal()" class="bg-red-500 text-white px-4 py-2 rounded">Close</button>
+                                <button onclick="closeModal()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Close</button>
                             </div>
                         </div>
                     `;
