@@ -186,9 +186,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const fullStars = Math.floor(rating);
         const halfStar = rating % 1 >= 0.5 ? 1 : 0;
         const emptyStars = 5 - fullStars - halfStar;
-
-        return "★".repeat(fullStars) + "☆".repeat(emptyStars);
+    
+        return "★".repeat(fullStars) + (halfStar ? "✩" : "") + "☆".repeat(emptyStars);
     }
+    
 
     async function loadRatings(mealId) {
         const response = await fetch("rateMeal.php", {
@@ -211,12 +212,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     }
-    
-
-
-
-
-
     
     function displayError(message) {
         searchResults.innerHTML = `<p class="text-red-500">${message}</p>`;

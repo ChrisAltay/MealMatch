@@ -19,15 +19,15 @@ $isLoggedIn = isset($_SESSION['username']); // Check if the user is logged in
 
     <script>
 
-function toggleMenu() {
-        document.getElementById('mobile-menu').classList.toggle('hidden');
-    }
+        function toggleMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
 
-    // Attach event listener to the hamburger button
-    document.querySelector(".md:hidden").addEventListener("click", toggleMenu);
+        // Attach event listener to the hamburger button
+        document.querySelector(".md:hidden").addEventListener("click", toggleMenu);
 
-    // Attach event listener to the close button inside the menu
-    document.querySelector("#mobile-menu button").addEventListener("click", toggleMenu);
+        // Attach event listener to the close button inside the menu
+        document.querySelector("#mobile-menu button").addEventListener("click", toggleMenu);
 
 
         function scrollToSearch() {
@@ -48,22 +48,22 @@ function toggleMenu() {
                 },
                 body: JSON.stringify({ mealId: mealId })
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Meal saved to favorites in profile.');
-                } else {
-                    alert('Error occurred: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error saving meal:', error);
-                alert('Error occurred while saving the meal.');
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Meal saved to favorites in profile.');
+                    } else {
+                        alert('Error occurred: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error saving meal:', error);
+                    alert('Error occurred while saving the meal.');
+                });
         }
 
-// Function to rate a meal
-function rateMeal(mealId) {
+        // Function to rate a meal
+        function rateMeal(mealId) {
             if (!isLoggedIn()) {
                 alert('Please log in to rate meals.');
                 return;
@@ -78,27 +78,61 @@ function rateMeal(mealId) {
                     },
                     body: JSON.stringify({ mealId, rating }),
                 })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.success ? 'Thanks for your feedback!' : data.message);
-                })
-                .catch(error => {
-                    console.error('Error rating meal:', error);
-                    alert('An error occurred while rating the meal.');
-                });
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.success ? 'Thanks for your feedback!' : data.message);
+                    })
+                    .catch(error => {
+                        console.error('Error rating meal:', error);
+                        alert('An error occurred while rating the meal.');
+                    });
             } else {
                 alert('Please enter a valid rating, numbers(1-5), 1 being very bad and 5 very good..');
             }
         }
 
-        // Function to bookmark a meal
         async function bookmarkMeal(mealId) {
             if (!isLoggedIn()) {
                 alert('Please log in to bookmark meals.');
                 return;
             }
-            // Redirect to calendar.php
-            window.location.href = `calendar.php?mealId=${mealId}`;
+
+            try {
+                // Fetch meal details from TheMealDB API
+                const response = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealId}`);
+                const data = await response.json();
+
+                if (!data.meals || data.meals.length === 0) {
+                    alert('Meal details not found.');
+                    return;
+                }
+
+                const mealName = data.meals[0].strMeal; // Extract meal name
+
+                // Create Google Calendar link with the meal name
+                createGoogleCalendarLink(mealName);
+
+            } catch (error) {
+                console.error('Error fetching meal details:', error);
+                alert('Failed to retrieve meal details.');
+            }
+        }
+
+
+
+
+        function createGoogleCalendarLink(mealName) {
+            // Set the date for the calendar event
+            const startDate = new Date();
+            startDate.setHours(12, 0, 0); // Set the time to 12:00 PM
+            const endDate = new Date(startDate);
+            endDate.setHours(13, 0, 0); // Set the end time to 1:00 PM
+
+            // Create Google Calendar link
+            const googleCalendarLink = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(mealName)}&dates=${startDate.toISOString().replace(/-|:|\.\d+/g, '')}/${endDate.toISOString().replace(/-|:|\.\d+/g, '')}`;
+
+            // Redirect to Google Calendar
+            window.location.href = googleCalendarLink;
         }
 
         // Function to show recipe details in a modal
@@ -159,141 +193,169 @@ function rateMeal(mealId) {
 
 <body class="font-sans">
     <div class="container mx-auto">
-       <!-- Navigation -->
-<nav x-data="{ menuOpen: false }" class="flex justify-between items-center py-4 px-6 border-b shadow-md relative">
-    <!-- MealMatch Title (Smaller on Mobile) -->
-    <div class="text-4xl font-extrabold ml-[1] md:ml-[2] lg:ml-20">
-        <span class="text-black">Meal</span><span class="text-blue-500">Match</span>
-    </div>
+        <!-- Navigation -->
+        <nav x-data="{ menuOpen: false }"
+            class="flex justify-between items-center py-4 px-6 border-b shadow-md relative">
+            <!-- MealMatch Title (Smaller on Mobile) -->
+            <div class="text-4xl font-extrabold ml-[1] md:ml-[2] lg:ml-20">
+                <span class="text-black">Meal</span><span class="text-blue-500">Match</span>
+            </div>
 
-    <!-- Hamburger Menu Button (Mobile Only) -->
-    <button class="md:hidden text-3xl z-50 transition-all duration-300" @click="menuOpen = !menuOpen">
-        <span x-show="!menuOpen">☰</span>
-        <span x-show="menuOpen">✖</span>
-    </button>
+            <!-- Hamburger Menu Button (Mobile Only) -->
+            <button class="md:hidden text-3xl z-50 transition-all duration-300" @click="menuOpen = !menuOpen">
+                <span x-show="!menuOpen">☰</span>
+                <span x-show="menuOpen">✖</span>
+            </button>
 
-    <!-- Desktop Navigation -->
-    <div class="hidden md:flex space-x-3 mr-[10%]">
-        <a href="index.php" class="text-xl font-semibold text-blue-500 hover:bg-blue-500 hover:text-white rounded-md px-3 py-2 transition">Home</a>
-        <a href="about.php" class="text-xl font-semibold text-blue-500 hover:bg-blue-500 hover:text-white rounded-md px-3 py-2 transition">About</a>
+            <!-- Desktop Navigation -->
+            <div class="hidden md:flex space-x-3 mr-[10%]">
+                <a href="index.php"
+                    class="text-xl font-semibold text-blue-500 hover:bg-blue-500 hover:text-white rounded-md px-3 py-2 transition">Home</a>
+                <a href="about.php"
+                    class="text-xl font-semibold text-blue-500 hover:bg-blue-500 hover:text-white rounded-md px-3 py-2 transition">About</a>
 
-        <?php if ($isLoggedIn): ?>
-            <a href="profile.php" class="text-xl font-semibold text-white bg-blue-500 hover:bg-blue-700 rounded-md px-3 py-2 transition">Profile</a>
-            <a href="logout.php" class="text-xl font-semibold text-blue-500 hover:bg-blue-500 hover:text-white rounded-md px-3 py-2 transition">Logout</a>
-        <?php else: ?>
-            <a href="login.php" class="text-xl font-semibold text-blue-500 hover:bg-blue-500 hover:text-white rounded-md px-3 py-2 transition">Login</a>
-            <a href="signup.php" class="text-xl font-semibold text-white bg-blue-500 hover:bg-blue-700 rounded-md px-3 py-2 transition">Sign up</a>
-        <?php endif; ?>
-    </div>
+                <?php if ($isLoggedIn): ?>
+                    <a href="profile.php"
+                        class="text-xl font-semibold text-white bg-blue-500 hover:bg-blue-700 rounded-md px-3 py-2 transition">Profile</a>
+                    <a href="logout.php"
+                        class="text-xl font-semibold text-blue-500 hover:bg-blue-500 hover:text-white rounded-md px-3 py-2 transition">Logout</a>
+                <?php else: ?>
+                    <a href="login.php"
+                        class="text-xl font-semibold text-blue-500 hover:bg-blue-500 hover:text-white rounded-md px-3 py-2 transition">Login</a>
+                    <a href="signup.php"
+                        class="text-xl font-semibold text-white bg-blue-500 hover:bg-blue-700 rounded-md px-3 py-2 transition">Sign
+                        up</a>
+                <?php endif; ?>
+            </div>
 
-    <!-- Mobile Menu Overlay (Backdrop) -->
-<div x-show="menuOpen" x-cloak class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden" @click="menuOpen = false"></div>
+            <!-- Mobile Menu Overlay (Backdrop) -->
+            <div x-show="menuOpen" x-cloak class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden"
+                @click="menuOpen = false"></div>
 
-<!-- Mobile Menu Overlay (Backdrop) -->
-<div x-show="menuOpen" x-cloak class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" @click="menuOpen = false"></div>
+            <!-- Mobile Menu Overlay (Backdrop) -->
+            <div x-show="menuOpen" x-cloak class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+                @click="menuOpen = false"></div>
 
-<!-- Mobile Slide-in Menu  -->
-<div x-show="menuOpen" x-cloak 
-     x-transition:enter="transition transform duration-300 ease-in-out"
-     x-transition:enter-start="translate-x-full opacity-0"
-     x-transition:enter-end="translate-x-0 opacity-100"
-     x-transition:leave="transition transform duration-300 ease-in-out"
-     x-transition:leave-start="translate-x-0 opacity-100"
-     x-transition:leave-end="translate-x-full opacity-0"
-     class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg z-50 p-6 md:hidden">
+            <!-- Mobile Slide-in Menu  -->
+            <div x-show="menuOpen" x-cloak x-transition:enter="transition transform duration-300 ease-in-out"
+                x-transition:enter-start="translate-x-full opacity-0" x-transition:enter-end="translate-x-0 opacity-100"
+                x-transition:leave="transition transform duration-300 ease-in-out"
+                x-transition:leave-start="translate-x-0 opacity-100" x-transition:leave-end="translate-x-full opacity-0"
+                class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg z-50 p-6 md:hidden">
 
-    <!-- Close Button -->
-    <button class="absolute top-4 right-4 text-3xl text-blue-600 hover:text-blue-800" @click="menuOpen = false">✖</button>
+                <!-- Close Button -->
+                <button class="absolute top-4 right-4 text-3xl text-blue-600 hover:text-blue-800"
+                    @click="menuOpen = false">✖</button>
 
-    <!-- Menu Items -->
-    <div class="mt-12 flex flex-col space-y-4 text-xl">
-        <a href="index.php" class="text-blue-500 hover:bg-blue-500 hover:text-white rounded-md px-4 py-2 transition" @click="menuOpen = false">Home</a>
-        <a href="about.php" class="text-blue-500 hover:bg-blue-500 hover:text-white rounded-md px-4 py-2 transition" @click="menuOpen = false">About</a>
+                <!-- Menu Items -->
+                <div class="mt-12 flex flex-col space-y-4 text-xl">
+                    <a href="index.php"
+                        class="text-blue-500 hover:bg-blue-500 hover:text-white rounded-md px-4 py-2 transition"
+                        @click="menuOpen = false">Home</a>
+                    <a href="about.php"
+                        class="text-blue-500 hover:bg-blue-500 hover:text-white rounded-md px-4 py-2 transition"
+                        @click="menuOpen = false">About</a>
 
-        <?php if ($isLoggedIn): ?>
-            <a href="profile.php" class="text-white bg-blue-500 hover:bg-blue-700 rounded-md px-4 py-2 transition" @click="menuOpen = false">Profile</a>
-            <a href="logout.php" class="text-blue-500 hover:bg-blue-500 hover:text-white rounded-md px-4 py-2 transition" @click="menuOpen = false">Logout</a>
-        <?php else: ?>
-            <a href="login.php" class="text-blue-500 hover:bg-blue-500 hover:text-white rounded-md px-4 py-2 transition" @click="menuOpen = false">Login</a>
-            <a href="signup.php" class="text-white bg-blue-500 hover:bg-blue-700 rounded-md px-4 py-2 transition" @click="menuOpen = false">Sign up</a>
-        <?php endif; ?>
-    </div>
-</div>
-
-</nav>
-
-        <!-- Main Content -->
-        <div class="flex flex-wrap md:flex-nowrap mb-20">     
-
-            <div class="w-full md:w-2/3 p-4 mt-0 md:mt-[110px] ml-[4%] order-2 md:order-1">
-                <h1 class="font-bold text-4xl md:text-6xl text bg-gradient-to-r from-blue-500 to-green-500 bg-clip-text text-transparent">Learn. Cook. Save.</h1>
-                <h1 class="font-bold text-4xl md:text-6xl text bg-gradient-to-r from-blue-500 to-green-500 bg-clip-text text-transparent">Cooking Made Easy!</h1>
-                <p class="max-w-md py-3 text-[20px] md:text-[27px]">Say good bye to long and frustrating food blogs and recipe videos. Access our recipe cards to prepare any dish in minutes.</p>
-                <div class="flex">
-                    <button class="border px-4 py-2 bg-blue-500 text-white text-2xl rounded-md px-3 md:ml-[20%] mx-auto hover:bg-blue-700" onclick="scrollToSearch()">Browse Dish</button>
+                    <?php if ($isLoggedIn): ?>
+                        <a href="profile.php"
+                            class="text-white bg-blue-500 hover:bg-blue-700 rounded-md px-4 py-2 transition"
+                            @click="menuOpen = false">Profile</a>
+                        <a href="logout.php"
+                            class="text-blue-500 hover:bg-blue-500 hover:text-white rounded-md px-4 py-2 transition"
+                            @click="menuOpen = false">Logout</a>
+                    <?php else: ?>
+                        <a href="login.php"
+                            class="text-blue-500 hover:bg-blue-500 hover:text-white rounded-md px-4 py-2 transition"
+                            @click="menuOpen = false">Login</a>
+                        <a href="signup.php"
+                            class="text-white bg-blue-500 hover:bg-blue-700 rounded-md px-4 py-2 transition"
+                            @click="menuOpen = false">Sign up</a>
+                    <?php endif; ?>
                 </div>
             </div>
-            
+
+        </nav>
+
+        <!-- Main Content -->
+        <div class="flex flex-wrap md:flex-nowrap mb-20">
+
+            <div class="w-full md:w-2/3 p-4 mt-0 md:mt-[110px] ml-[4%] order-2 md:order-1">
+                <h1
+                    class="font-bold text-4xl md:text-6xl text bg-gradient-to-r from-blue-500 to-green-500 bg-clip-text text-transparent">
+                    Learn. Cook. Save.</h1>
+                <h1
+                    class="font-bold text-4xl md:text-6xl text bg-gradient-to-r from-blue-500 to-green-500 bg-clip-text text-transparent">
+                    Cooking Made Easy!</h1>
+                <p class="max-w-md py-3 text-[20px] md:text-[27px]">Say good bye to long and frustrating food blogs and
+                    recipe videos. Access our recipe cards to prepare any dish in minutes.</p>
+                <div class="flex">
+                    <button
+                        class="border px-4 py-2 bg-blue-500 text-white text-2xl rounded-md px-3 md:ml-[20%] mx-auto hover:bg-blue-700"
+                        onclick="scrollToSearch()">Browse Dish</button>
+                </div>
+            </div>
+
             <div class="w-full md:w-2/3 rounded-full drop-shadow-2xl mt-10 order-1 md:order-2">
                 <div>
-                    <img id="dishImage" alt="Image of Dish" class="w-[80%] h-auto mx-auto md:mx-0 transition duration-500" src="SalmonDish1.png" />
+                    <img id="dishImage" alt="Image of Dish"
+                        class="w-[80%] h-auto mx-auto md:mx-0 transition duration-500" src="SalmonDish1.png" />
                 </div>
             </div>
 
         </div>
-        
-      <!-- Search Section -->
-<div class="bg-blue-50 py-10" id="search-section">
-    <h2 class="text-center text-2xl mb-4 font-bold">Search For A Dish</h2>
 
-    <!-- White Box Around Search Bar and Results -->
-    <div class="bg-white shadow-lg rounded-lg mx-auto max-w-screen-lg p-6">
-        
-        <!-- Search Form -->
-        <form id="search-form" class="flex items-center space-x-2">
-            <div class="relative flex-grow">
-                <input id="search-input" 
-                    class="border border-gray-300 p-2 w-full rounded-md focus:bg-white focus:ring-0 focus:border-gray-300" 
-                    placeholder="Enter ingredients (e.g., chicken, broccoli)" type="text" />
-                <ul id="suggestions-list" 
-                    class="absolute z-10 bg-white border border-gray-300 w-full mt-1 hidden">
-                </ul>
+        <!-- Search Section -->
+        <div class="bg-blue-50 py-10" id="search-section">
+            <h2 class="text-center text-2xl mb-4 font-bold">Search For A Dish</h2>
+
+            <!-- White Box Around Search Bar and Results -->
+            <div class="bg-white shadow-lg rounded-lg mx-auto max-w-screen-lg p-6">
+
+                <!-- Search Form -->
+                <form id="search-form" class="flex items-center space-x-2">
+                    <div class="relative flex-grow">
+                        <input id="search-input"
+                            class="border border-gray-300 p-2 w-full rounded-md focus:bg-white focus:ring-0 focus:border-gray-300"
+                            placeholder="Enter ingredients (e.g., chicken, broccoli)" type="text" />
+                        <ul id="suggestions-list"
+                            class="absolute z-10 bg-white border border-gray-300 w-full mt-1 hidden">
+                        </ul>
+                    </div>
+                    <button type="submit"
+                        class="border p-2 rounded-md bg-blue-500 text-white hover:bg-blue-700 transition">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </form>
+
+                <!-- Search Results -->
+                <div id="search-results" class="flex flex-wrap justify-center gap-4 mt-6"></div>
             </div>
-            <button type="submit" 
-                class="border p-2 rounded-md bg-blue-500 text-white hover:bg-blue-700 transition">
-                <i class="fas fa-search"></i> Search
-            </button>
-        </form>
-
-        <!-- Search Results -->
-        <div id="search-results" class="flex flex-wrap justify-center gap-4 mt-6"></div>
-    </div>
-</div>
+        </div>
 
 
-    <!-- Scripts -->
-    <script src="search.js" defer></script>
+        <!-- Scripts -->
+        <script src="search.js" defer></script>
 
-    <script>
-    // Function to trigger the spin animation on login or sign-up
-    function spinDish() {
-        const dishImage = document.getElementById("dishImage");
-        if (dishImage) {
-            dishImage.classList.add("animate-spin"); // Add spin effect
-            setTimeout(() => {
-                dishImage.classList.remove("animate-spin"); // Remove spin after 2 seconds
-            }, 1000);
-        }
-    }
+        <script>
+            // Function to trigger the spin animation on login or sign-up
+            function spinDish() {
+                const dishImage = document.getElementById("dishImage");
+                if (dishImage) {
+                    dishImage.classList.add("animate-spin"); // Add spin effect
+                    setTimeout(() => {
+                        dishImage.classList.remove("animate-spin"); // Remove spin after 2 seconds
+                    }, 1000);
+                }
+            }
 
-    // Run the spinDish function when the user logs in or signs up
-    document.addEventListener("DOMContentLoaded", function () {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has("login") || urlParams.has("signup")) {
-            spinDish();
-        }
-    });
-</script>
+            // Run the spinDish function when the user logs in or signs up
+            document.addEventListener("DOMContentLoaded", function () {
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has("login") || urlParams.has("signup")) {
+                    spinDish();
+                }
+            });
+        </script>
 
 </body>
 
